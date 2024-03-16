@@ -4,25 +4,32 @@ import CoinTable from "../modules/CoinTable";
 import Pagination from "../modules/Pagination";
 
 import { getCoinList } from "../../services/CryptoApi";
+import SearchBar from "../modules/SearchBar";
 
 function HomePage() {
   const [coins, setCoins] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [currency, setCurrency] = useState("usd");
 
   useEffect(() => {
     setIsLoading(true);
     const getData = async () => {
-      const res = await fetch(getCoinList(page));
-      const json = await res.json();
-      setCoins(json);
-      setIsLoading(false);
+      try {
+        const res = await fetch(getCoinList(page, currency));
+        const json = await res.json();
+        setCoins(json);
+        setIsLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
     };
     getData();
-  }, [page]);
+  }, [page, currency]);
   return (
     <div>
-      <CoinTable coins={coins} isLoading={isLoading} />
+      <SearchBar currency={currency} setCurrency={setCurrency} />
+      <CoinTable coins={coins} isLoading={isLoading} currency={currency} />
       <Pagination page={page} setPage={setPage} />
     </div>
   );
